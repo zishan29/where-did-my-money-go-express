@@ -1,15 +1,10 @@
 import express from "express";
-import testRoutes from "./routes/index.ts"
-import dotenv from "dotenv";
-dotenv.config()
-
 import cors from "cors";
+import router from "./routes/index";
 
 const app = express();
-app.use(express.json());
 app.use(cors({ origin: "http://localhost:5173" }));
-app.use("/api/parse", testRoutes);
+app.use(express.json());
+app.use("/api/parse", router);
 
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
-})
+export default app;
