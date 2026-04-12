@@ -4,6 +4,7 @@ import multer from "multer";
 import { extractTextFromPDF } from "../services/pdf";
 import { parseExpense } from "../services/gemini";
 import { generateInsights } from "../services/insights";
+import { answerQuestion } from "../services/chat";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -33,6 +34,19 @@ router.post("/insights", async (req, res) => {
 
   const insights = await generateInsights(expenses);
   res.status(200).json({ insights });
+});
+
+router.post("/chat", async (req, res) => {
+  const { question, expenses } = req.body;
+  if (!question || !expenses?.length)
+    return res.status(400).json({ error: "Missing question or expenses" });
+
+  try {
+    const answer = await answerQuestion(question, expenses);
+    res.status(200).json({ answer });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 export default router;
