@@ -21,19 +21,38 @@ function sanitizeStatement(text: string): string {
 router.post("/upload", upload.single("statement"), async (req, res) => {
   const buffer = req.file?.buffer;
   if (!buffer) return res.status(400).json({ error: "No file uploaded" });
-
-  const text = await extractTextFromPDF(buffer);
-  const sanitized = sanitizeStatement(text);
-  const expenses = await parseExpense(sanitized);
-  res.status(200).json({ raw: expenses });
+  try {
+    const text = await extractTextFromPDF(buffer);
+    const sanitized = sanitizeStatement(text);
+    const expenses = await parseExpense(sanitized);
+    res.status(200).json({ raw: expenses });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("GEMINI ERROR:", err);
+      res.status(500).json({ error: err.message });
+    } else {
+      console.error("Unknown error", err);
+      res.status(500).json({ error: "Something went wrong" });
+    }
+  }
 });
 
 router.post("/insights", async (req, res) => {
   const { expenses } = req.body;
   if (!expenses?.length) return res.status(400).json({ error: "No expenses" });
 
-  const insights = await generateInsights(expenses);
-  res.status(200).json({ insights });
+  try {
+    const insights = await generateInsights(expenses);
+    res.status(200).json({ insights });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("GEMINI ERROR:", err);
+      res.status(500).json({ error: err.message });
+    } else {
+      console.error("Unknown error", err);
+      res.status(500).json({ error: "Something went wrong" });
+    }
+  }
 });
 
 router.post("/chat", async (req, res) => {
