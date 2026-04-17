@@ -34,7 +34,7 @@ Keep it to 2-3 sentences max. Don't use bullet points.
 If you can't answer from the data, say so honestly.`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3-flash-preview",
     contents: PROMPT,
   });
 
